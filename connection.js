@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
 });
 
 connection.connect( () => {
-    console.log("you are connected, listening on " + connection.threadId);
+    //console.log("you are connected, listening on " + connection.threadId);
     //afterConnection();
 });
 
