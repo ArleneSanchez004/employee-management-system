@@ -6,7 +6,7 @@ function start(){
     inquirer.prompt({
         name: "viewAddUpdate",
         type: "list",
-        message: "Would you like to VIEW or ADD depts, roles, or employees? Or UPDATE an employee's role or manager?",
+        message: "What would you like to do?",
         choices: [
             "VIEW Departments",
             "VIEW Roles",
@@ -22,12 +22,12 @@ function start(){
     }).then(answer => {
         if(answer.viewAddUpdate === "VIEW Departments") {
             viewDept();
-        }else if(answer.viewAddUpdate === "ADD") {
-            console.log("choice is ADD");
-            //addDept();
-        }else if(answer.viewAddUpdate === "UPDATE") {
-            console.log("choice is UPDATE");
-
+        }else if(answer.viewAddUpdate === "VIEW Roles") {
+            viewRoles();
+        }else if(answer.viewAddUpdate === "VIEW Employees") {
+            viewEmployees();
+        }else if(answer.viewAddUpdate === "VIEW Employees by Role") {
+            viewEmployeesByRole();
         }else connection.end();
     });
 }
@@ -38,7 +38,31 @@ function viewDept(){
          console.table(result);
          start();
      });
-    };
+};
+
+function viewRoles(){
+    connection.query("SELECT id, title, department_id FROM role", (err, result) => {
+        if (err) throw err;
+        console.table(result);
+        start();
+    });
+};
+
+function viewEmployees(){
+    connection.query("SELECT first_name, last_name FROM employee", (err, result) => {
+        if (err) throw err;
+        console.table(result);
+        start();
+    });
+};
+
+function viewEmployeesByRole(){
+    connection.query("SELECT employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id", (err, result) => {
+        if (err) throw err;
+        console.table(result);
+        start();
+    });
+};
 
 
 // function addDept(){
