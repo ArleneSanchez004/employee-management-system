@@ -28,6 +28,12 @@ function start(){
             viewEmployees();
         }else if(answer.viewAddUpdate === "VIEW Employees by Role") {
             viewEmployeesByRole();
+        }else if(answer.viewAddUpdate === "VIEW Employees by Department") {
+            viewEmployeesByDepartment();
+        }else if(answer.viewAddUpdate === "ADD Department") {
+            addDepartment();
+        }else if(answer.viewAddUpdate === "ADD Role") {
+            addRole();
         }else connection.end();
     });
 }
@@ -57,22 +63,34 @@ function viewEmployees(){
 };
 
 function viewEmployeesByRole(){
-    connection.query("SELECT employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id", (err, result) => {
+    connection.query("SELECT employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role ON employee.role_id = role.id", (err, result) => {
         if (err) throw err;
         console.table(result);
         start();
     });
 };
 
+function viewEmployeesByDepartment(){
+    connection.query("SELECT employee.first_name, employee.last_name, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id", (err, result) => {
+        if (err) throw err;
+        console.table(result);
+        start();
+    });
+};
 
-// function addDept(){
-//     inquirer.prompt({
-//         name: "newDept",
-//         type: "input",
-//         message: "What department would you like to add?"
-//     }).then(answer => {
-//         connection.query("INSERT INTO department (name) SET ?", (answer.newDept));
-//         console.log(answer.newDept);
-//     });
-// }
+function addDepartment(){
+    inquirer.prompt({
+        name: "addDept",
+        type: "input",
+        message: "What department would you like to add?"
+    }).then(answer => {
+        connection.query("INSERT INTO department SET ?", { name: answer.addDept }, (err, result) =>{
+            if (err) throw err;
+            console.log(`Successfully added ${answer.addDept} to Departments.`);
+            start();
+        });
+    });
+};
+
+
  start();
