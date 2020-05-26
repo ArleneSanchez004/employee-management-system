@@ -34,6 +34,8 @@ function start(){
             addDepartment();
         }else if(answer.viewAddUpdate === "ADD Role") {
             addRole();
+        }else if(answer.viewAddUpdate === "ADD Employee") {
+            addEmployee();
         }else connection.end();
     });
 }
@@ -112,7 +114,39 @@ function addRole(){
     ]).then(answer => {
         connection.query("INSERT INTO role SET ?", { title: answer.roleTitle, salary: answer.roleSalary, department_id: answer.roleDepartmentId }, (err, result) =>{
             if (err) throw err;
-            console.log(`Successfully added ${answer.roleTitle} to Departments.`);
+            console.log(`Successfully added ${answer.roleTitle} to Roles.`);
+            start();
+        });
+    });
+};
+
+function addEmployee(){
+    inquirer.prompt([
+        {
+            name: "firstName",
+            type: "input",
+            message: "What is the first name?"
+        },
+        {
+           name: "lastName",
+           type: "input",
+           message: "What is the last name?"
+        },
+        {
+            name: "roleId",
+            type: "input",
+            message: "What is the role ID?"
+        },
+        {
+            name: "managerId",
+            type: "input",
+            message: "What is the manager ID?",
+            default: "null"
+        }
+    ]).then(answer => {
+        connection.query("INSERT INTO employee SET ?", { first_name: answer.firstName, last_name: answer.lastName, role_id: answer.roleId, manager_id: answer.managerId }, (err, result) =>{
+            if (err) throw err;
+            console.log(`Successfully added ${answer.firstName} ${answer.lastName} to Employees.`);
             start();
         });
     });
