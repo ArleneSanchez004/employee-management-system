@@ -92,5 +92,30 @@ function addDepartment(){
     });
 };
 
+function addRole(){
+    inquirer.prompt([
+        {
+            name: "roleTitle",
+            type: "input",
+            message: "What Role would you like to add?"
+        },
+        {
+           name: "roleSalary",
+           type: "input",
+           message: "What is this position's salary?"
+        },
+        {
+            name: "roleDepartmentId",
+            type: "input",
+            message: "What is the DepartmentId?"
+        }
+    ]).then(answer => {
+        connection.query("INSERT INTO role SET ?", { title: answer.roleTitle, salary: answer.roleSalary, department_id: answer.roleDepartmentId }, (err, result) =>{
+            if (err) throw err;
+            console.log(`Successfully added ${answer.roleTitle} to Departments.`);
+            start();
+        });
+    });
+}
 
  start();
