@@ -154,60 +154,53 @@ function addEmployee(){
 }
 
 function updateEmployeeRole(){
-    connection.query("SELECT * FROM employee", (err, result) => {
-        if (err) throw err;
-        let namesArray = [];
-        for(i=0; i < result.length ; i++){
-            let fullName = result[i].first_name + " " + result[i].last_name;
-            namesArray.push(fullName);
-        }
-    });
-    connection.query("SELECT * FROM role", (err, result2) => {
+    connection.query("SELECT first_name, last_name FROM employee", (err, result) => {
         if (err) throw err;
         let roleTitles = [];
-        for(i=0; i < result2.length ; i++){
-            let title = result[i].title;
-            roleTitles.push(title);
+        let namesArray = [];
+        for(i=0; i < result.length ; i++){
+            let first = result[i].first_name;
+            let last = result[i].last_name;
+            //console.log(first + " " + last);
+            namesArray.push(first + " " + last);
         }
+        connection.query("SELECT title FROM role", (err, result2) => {
+            if (err) throw err;
+            for(j=0; j < result2.length ; j++){
+                roleTitles.push(result2[j].title);
+                //console.log(roleTitles);
+            }
+            inquirer.prompt([
+                {
+                    name: "employeeChoice",
+                    type: "list",
+                    message: "Which Employee would you like to update?",
+                    choices: namesArray
+                },
+                {
+                   name: "roleChoice",
+                   type: "list",
+                   message: "Which role would you like the Employee to have?",
+                   choices: roleTitles 
+                }
+            ]).then(function(employeeChoice, roleChoice, err){
+                if (err) throw err;
+                //console.log(employeeChoice.employeeChoice);
+                //console.log(employeeChoice.roleChoice);
+                
+                connection.query("SELECT id FROM role WHERE title = ?", [employeeChoice.roleChoice], (err, result3) => {
+                    if (err) throw err;
+                    let roleId = result3[0].id;
+                    let name = employeeChoice.employeeChoice.split(" ");
+                    connection.query("UPDATE employee SET role_id = ? WHERE first_name = ? and last_name = ?", [roleId, name[0], name[1]], (err, res) => {
+                        if(err) throw err;
+                        console.log(`${employeeChoice.employeeChoice} has been successfully updated to ${employeeChoice.roleChoice}`);
+                        start();
+                    })
+                }); 
+            });
+        });
     });
-    inquirer.prompt([
-        {
-            name: "employeeChoice",
-            type: "list",
-            message: "Which Employee would you like to update?",
-            choices: namesArray
-        },
-        {
-           name: "roleChoice",
-           type: "list",
-           message: "Which role would you the Employee to have?",
-           choices: roleTitles 
-        }
-    ]).then(answers => {
-        connection.query("SELECT * FROM employee", (err, result3) => {
-            if (err) throw err;
-            let chosenEmployee;
-            for (i=0; i < result3.length; i++){
-                if(result3[i].first_name + " " + result3[i].last_name === answers.employeeChoice){
-                    chosenEmployee = result3[i];
-                }
-            }
-        });
-        connection.query("SELECT * FROM role", (err, result4) => {
-            if (err) throw err;
-            let chosenRole;
-            for (i=0; i < result4.length; i++){
-                if(result4[i].title === answers.roleTitles){
-                    chosenRole = result4[i];
-                }
-            }
-        });
-        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [chosenRole.id, chosenEmployee.id], err => {
-            if (err) throw err;
-            console.log(`${chosenEmployee}'s role has been updated to ${chosenRole}`);
-            start();
-        });
-    })
 };
 
 
